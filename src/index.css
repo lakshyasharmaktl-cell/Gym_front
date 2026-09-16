@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #f8f9fa;
+    color: #1e293b;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4 {
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  label {
+    font-style: italic;
+  }
+}
+
+@layer utilities {
+  .italic-heading {
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .gym-brand {
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    padding: 1.5rem;
+  }
+
+  .status-active {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .status-pending {
+    background: #fef9c3;
+    color: #ca8a04;
+  }
+
+  .status-expired {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .btn-primary {
+    background: #1e293b;
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-style: italic;
+    font-weight: 600;
+    transition: background 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary:hover {
+    background: #334155;
+  }
+
+  .btn-gold {
+    background: #f59e0b;
+    color: #1e293b;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-style: italic;
+    font-weight: 700;
+    transition: background 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-gold:hover {
+    background: #d97706;
+  }
+
+  .btn-danger {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-style: italic;
+    font-weight: 600;
+    transition: background 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-danger:hover {
+    background: #fecaca;
+  }
+
+  .input-field {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #fafafa;
+    font-style: italic;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input-field:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    font-style: italic;
+    font-weight: 600;
+    color: #475569;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .sidebar-link:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+  }
+  .sidebar-link.active {
+    background: #1e293b;
+    color: #f59e0b;
+  }
+
+  .table-th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-style: italic;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .table-td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+    color: #334155;
+  }
+}
