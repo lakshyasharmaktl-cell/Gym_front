@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { MdDelete } from "react-icons/md";
 import api from "../api/axiosConfig";
 
 const fmt = (n) =>
@@ -18,9 +19,22 @@ export default function PaymentsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
+  const fetchPayments = () => {
+    setLoading(true);
     api.get("/payments").then(({ data }) => setPayments(data)).finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetchPayments(); }, []);
+
+  const handleDelete = async (paymentId, memberName, amount) => {
+    if (!window.confirm(`Delete ₹${amount} payment for "${memberName}"?\n\nThis will reverse the amount from their account.`)) return;
+    try {
+      await api.delete(`/payments/delete/${paymentId}`);
+      fetchPayments();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete payment.");
+    }
+  };
 
   const filtered = payments.filter(
     (p) =>
@@ -74,6 +88,7 @@ export default function PaymentsPage() {
                 <th className="table-th">Amount</th>
                 <th className="table-th">Mode</th>
                 <th className="table-th">Note</th>
+                <th className="table-th">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -95,6 +110,15 @@ export default function PaymentsPage() {
                     </span>
                   </td>
                   <td className="table-td italic text-slate-400 text-sm">{p.note || "—"}</td>
+                  <td className="table-td">
+                    <button
+                      onClick={() => handleDelete(p._id, p.member?.name, p.amount)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition"
+                      title="Delete this payment"
+                    >
+                      <MdDelete size={17} />
+                    </button>
+                  </td>
                 </motion.tr>
               ))}
             </tbody>

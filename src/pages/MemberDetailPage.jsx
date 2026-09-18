@@ -225,26 +225,78 @@ export default function MemberDetailPage() {
 
         {/* ── PAY DUE TAB ── */}
         {tab === "pay" && (
-          <form onSubmit={handlePayment} className="card space-y-4 max-w-lg">
+          <div className="card space-y-4 max-w-lg">
             <h2 className="font-bold italic text-slate-700 border-b border-slate-100 pb-2">
-              Record Payment — Due: <span className="text-red-600">{fmt(ms?.dueAmount)}</span>
+              Collect Payment
             </h2>
-            <div>
-              <label className="block text-sm mb-1 text-slate-600">Amount (₹) *</label>
-              <input type="number" required value={payForm.amount} onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })} placeholder="0" className="input-field" />
-            </div>
-            <div>
-              <label className="block text-sm mb-1 text-slate-600">Payment Mode</label>
-              <select value={payForm.paymentMode} onChange={(e) => setPayForm({ ...payForm, paymentMode: e.target.value })} className="input-field">
-                <option>Cash</option><option>Online</option><option>Card</option><option>UPI</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm mb-1 text-slate-600">Note (optional)</label>
-              <input value={payForm.note} onChange={(e) => setPayForm({ ...payForm, note: e.target.value })} placeholder="e.g. Partial payment" className="input-field" />
-            </div>
-            <button type="submit" className="btn-gold">Record Payment</button>
-          </form>
+
+            {/* DUES CLEARED — block form */}
+            {(!ms?.dueAmount || ms.dueAmount <= 0) ? (
+              <div className="flex flex-col items-center py-8 text-center space-y-3">
+                <span className="text-5xl">✅</span>
+                <p className="text-lg font-black italic text-green-700">Dues Fully Cleared!</p>
+                <p className="text-sm italic text-slate-400">
+                  {member.name} has no outstanding balance.<br />
+                  Total paid: <span className="font-bold text-slate-700">{fmt(ms?.amountPaid)}</span>
+                </p>
+                <button type="button" onClick={() => setTab("renew")} className="btn-gold mt-2">
+                  Renew Membership Instead
+                </button>
+              </div>
+            ) : (
+              /* FORM — only shown when due > 0 */
+              <form onSubmit={handlePayment} className="space-y-4">
+                {/* Due banner */}
+                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex justify-between items-center">
+                  <span className="text-sm italic text-red-600 font-semibold">Outstanding Due</span>
+                  <span className="text-2xl font-black italic text-red-600">{fmt(ms.dueAmount)}</span>
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1 text-slate-600">Amount Collecting Now (₹) *</label>
+                  <input
+                    type="number"
+                    required
+                    value={payForm.amount}
+                    onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
+                    placeholder="0"
+                    max={ms.dueAmount}
+                    min="1"
+                    className="input-field text-lg font-bold"
+                  />
+                  {Number(payForm.amount) > ms.dueAmount && (
+                    <p className="text-xs italic text-amber-600 mt-1">⚠️ Cannot exceed due: {fmt(ms.dueAmount)}</p>
+                  )}
+                </div>
+
+                {/* Payment mode buttons */}
+                <div>
+                  <label className="block text-sm mb-2 text-slate-600">Payment Mode</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[{ mode: "Cash", emoji: "💵" }, { mode: "UPI", emoji: "📱" }, { mode: "Card", emoji: "💳" }, { mode: "Online", emoji: "🌐" }].map(({ mode, emoji }) => (
+                      <button key={mode} type="button"
+                        onClick={() => setPayForm({ ...payForm, paymentMode: mode })}
+                        className={`py-2.5 rounded-xl text-sm font-bold italic border-2 transition
+                          ${payForm.paymentMode === mode ? "bg-slate-800 text-amber-400 border-slate-800" : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"}`}>
+                        {emoji}<br />{mode}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1 text-slate-600">Note (optional)</label>
+                  <input value={payForm.note} onChange={(e) => setPayForm({ ...payForm, note: e.target.value })} placeholder="e.g. Partial payment" className="input-field" />
+                </div>
+
+                <button type="submit"
+                  disabled={!payForm.amount || Number(payForm.amount) <= 0 || Number(payForm.amount) > ms.dueAmount}
+                  className="btn-gold w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                  💰 Collect {payForm.amount ? fmt(payForm.amount) : "Payment"}
+                </button>
+              </form>
+            )}
+          </div>
         )}
 
         {/* ── PAYMENT HISTORY TAB ── */}

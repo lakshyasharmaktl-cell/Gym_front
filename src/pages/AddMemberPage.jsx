@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MdArrowBack, MdCheckCircle, MdFitnessCenter, MdDirectionsBike, MdSportsGymnastics, MdPerson, MdSchool } from "react-icons/md";
+import { MdArrowBack, MdCheckCircle } from "react-icons/md";
 import api from "../api/axiosConfig";
+import CameraModal from "../components/CameraModal";
 
 // ── Plan icon mapping ─────────────────────────────────────────────────────────
 const getPlanMeta = (name = "") => {
@@ -43,6 +44,7 @@ export default function AddMemberPage() {
   const [payment, setPayment] = useState({ amountPaid: "", paymentMode: "Cash" });
   const [photo, setPhoto]   = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   useEffect(() => {
     api.get("/memberships").then(({ data }) => setPlans(data));
@@ -50,10 +52,17 @@ export default function AddMemberPage() {
 
   const handleChange   = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handlePayChg   = (e) => setPayment({ ...payment, [e.target.name]: e.target.value });
+
   const handlePhotoChg = (e) => {
     const f = e.target.files[0];
+    if (!f) return;
     setPhoto(f);
-    if (f) setPhotoPreview(URL.createObjectURL(f));
+    setPhotoPreview(URL.createObjectURL(f));
+  };
+
+  const handleCameraCapture = (file, previewUrl) => {
+    setPhoto(file);
+    setPhotoPreview(previewUrl);
   };
 
   const dueAmount = selectedPlan
@@ -153,21 +162,51 @@ export default function AddMemberPage() {
                 👤 Personal Information
               </h2>
 
-              {/* Photo upload with preview */}
-              <div className="flex items-center gap-5">
-                <div className={`w-20 h-20 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden text-3xl
-                  ${photoPreview ? "border-amber-300" : "border-slate-200 bg-slate-50"}`}>
+              {/* Photo upload with preview — Camera or Gallery */}
+              <div className="flex items-start gap-5">
+                {/* Preview box */}
+                <div className={`w-24 h-24 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden flex-shrink-0
+                  ${photoPreview ? "border-amber-300 shadow-md" : "border-slate-200 bg-slate-50"}`}>
                   {photoPreview
                     ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
-                    : "📷"}
+                    : <span className="text-4xl select-none">📷</span>}
                 </div>
-                <div>
-                  <p className="text-sm italic font-semibold text-slate-600 mb-1">Member Photo</p>
-                  <label className="cursor-pointer inline-block px-4 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-semibold italic hover:bg-amber-50 hover:text-amber-700 transition">
-                    Choose Photo
-                    <input type="file" accept="image/*" onChange={handlePhotoChg} className="hidden" />
-                  </label>
-                  <p className="text-xs italic text-slate-400 mt-1">JPG, PNG up to 5MB</p>
+
+                <div className="space-y-2">
+                  <p className="text-sm italic font-semibold text-slate-600">Member Photo</p>
+                  <div className="flex flex-wrap gap-2">
+                    {/* 📷 Opens real webcam via CameraModal */}
+                    <button
+                      type="button"
+                      onClick={() => setCameraOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 text-amber-400 text-xs font-bold italic hover:bg-slate-700 transition select-none"
+                    >
+                      📷 Camera
+                    </button>
+
+                    {/* 🖼️ Opens file / gallery picker */}
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold italic hover:bg-amber-50 hover:text-amber-700 transition select-none">
+                      🖼️ Gallery
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChg}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {/* Remove photo */}
+                    {photoPreview && (
+                      <button
+                        type="button"
+                        onClick={() => { setPhoto(null); setPhotoPreview(null); }}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-red-50 text-red-500 text-xs font-bold italic hover:bg-red-100 transition"
+                      >
+                        ✕ Remove
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs italic text-slate-400">JPG, PNG · Optional</p>
                 </div>
               </div>
 
@@ -401,6 +440,13 @@ export default function AddMemberPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Camera modal — real webcam capture */}
+      <CameraModal
+        isOpen={cameraOpen}
+        onClose={() => setCameraOpen(false)}
+        onCapture={handleCameraCapture}
+      />
     </div>
   );
 }
